@@ -185,10 +185,20 @@
         <div class="container mx-auto px-6 text-center">
             <h2 class="font-space text-2xl font-bold tracking-tighter mb-4">STELLAR PROJECT</h2>
             <p class="text-gray-500 text-sm mb-6">Inovação em mapeamento mental.</p>
-            <div class="flex justify-center space-x-6">
-                <a href="#" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="instagram"></i></a>
-                <a href="#" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="github"></i></a>
-                <a href="#" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="linkedin"></i></a>
+            <div class="flex justify-center space-x-8">
+                <!-- GitHub Link -->
+                <a href="https://github.com/Nighttufo" target="_blank" class="text-gray-400 hover:text-white transition-colors flex flex-col items-center">
+                    <i data-lucide="github" class="w-6 h-6 mb-1"></i>
+                    <span class="text-[10px] uppercase tracking-widest">GitHub</span>
+                </a>
+                <!-- TikTok Link -->
+                <a href="https://tiktok.com/@stellarproject.com" target="_blank" class="text-gray-400 hover:text-white transition-colors flex flex-col items-center">
+                    <!-- Custom SVG para TikTok já que Lucide às vezes não tem nativo -->
+                    <svg class="w-6 h-6 mb-1 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V15.5c0 1.93-.75 3.81-2.11 5.17-1.36 1.36-3.24 2.11-5.17 2.11-1.93 0-3.81-.75-5.17-2.11-1.36-1.36-2.11-3.24-2.11-5.17 0-1.93.75-3.81 2.11-5.17 1.36-1.36 3.24-2.11 5.17-2.11.37 0 .73.03 1.09.09V12.4c-.36-.05-.72-.07-1.09-.07-1.18 0-2.31.47-3.14 1.31-.84.83-1.31 1.96-1.31 3.14 0 1.18.47 2.31 1.31 3.14.83.84 1.96 1.31 3.14 1.31 1.18 0 2.31-.47 3.14-1.31.84-.83 1.31-1.96 1.31-3.14V.02z"/>
+                    </svg>
+                    <span class="text-[10px] uppercase tracking-widest">TikTok</span>
+                </a>
             </div>
         </div>
     </footer>
