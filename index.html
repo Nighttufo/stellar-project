@@ -2,8 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stellar Pro - Settings Area</title>
+    <title>Stellar Mapper Pro - Cloud Ready</title>
     <style>
         :root {
             --space-black: #050508;
@@ -16,241 +15,265 @@
         body.mode-black { --space-black: #000; --accent: #666; --star-cyan: #fff; }
         body.mode-grid { --space-black: #050510; --accent: #ff9f43; --star-cyan: #ff9f43; }
 
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; touch-action: none; color: #fff; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; display: flex; color: #e0e0e0; }
 
-        /* Interface Principal */
-        #crosshair { position: fixed; top: 50%; left: 50%; width: 20px; height: 20px; border: 1px solid var(--star-cyan); transform: translate(-50%, -50%); pointer-events: none; z-index: 50; border-radius: 50%; opacity: 0.4; }
-        #btn-mark { position: fixed; bottom: 20px; right: 20px; width: 70px; height: 70px; background: var(--star-cyan); color: #000; border: none; border-radius: 50%; font-weight: bold; z-index: 100; font-size: 30px; box-shadow: 0 0 20px rgba(0,242,255,0.4); }
-        
-        #menu-toggle { position: fixed; top: 20px; left: 20px; width: 50px; height: 50px; background: var(--glass); color: var(--star-cyan); border-radius: 10px; border: 1px solid var(--star-cyan); z-index: 999; }
-        #settings-toggle { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; background: var(--glass); color: var(--star-cyan); border-radius: 10px; border: 1px solid var(--star-cyan); z-index: 999; font-size: 20px; }
+        #sidebar { width: 280px; background: var(--glass); height: 100vh; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; border-right: 1px solid rgba(255, 255, 255, 0.1); z-index: 10; }
 
-        /* Área Específica de Configurações */
-        #settings-area {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--space-black); z-index: 2000;
-            transform: translateY(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 30px; box-sizing: border-box; overflow-y: auto;
-        }
-        #settings-area.active { transform: translateY(0); }
+        #settings-panel { position: fixed; left: -320px; top: 0; width: 300px; height: 100vh; background: #0a0a15; border-right: 2px solid var(--accent); transition: 0.3s ease; z-index: 100; padding: 30px; box-sizing: border-box; overflow-y: auto; }
+        #settings-panel.open { left: 0; box-shadow: 20px 0 100px #000; }
 
-        /* Sidebar de Navegação */
-        #sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: var(--glass); padding: 20px; z-index: 1000; transform: translateX(-100%); transition: 0.3s; border-right: 1px solid rgba(255,255,255,0.1); }
-        #sidebar.active { transform: translateX(0); }
+        .map-explorer { flex-grow: 1; overflow-y: auto; margin: 20px 0; }
+        .map-item { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 4px; cursor: pointer; margin-top: 8px; border: 1px solid transparent; font-size: 0.8em; display: flex; justify-content: space-between; align-items: center; }
+        .active-map { border-color: var(--star-cyan); background: rgba(0, 242, 255, 0.1); }
 
-        .config-section { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        h2, h3 { color: var(--star-cyan); margin-top: 0; }
-        
-        button.action-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 8px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
-        button.action-btn:active { background: var(--accent); color: #000; }
+        button { cursor: pointer; padding: 10px; border: 1px solid var(--accent); border-radius: 4px; background: transparent; color: var(--accent); font-weight: bold; font-size: 0.75em; width: 100%; transition: 0.2s; margin-bottom: 8px; }
+        button:hover { background: var(--accent); color: #000; }
 
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 998; display: none; }
-        canvas { display: block; }
+        #custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--star-cyan); z-index: 200; display: none; min-width: 300px; }
+        #custom-modal.active { display: block; }
+        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff; box-sizing: border-box; }
+
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 80; display: none; }
+        canvas { flex-grow: 1; cursor: crosshair; background: var(--space-black); }
     </style>
 </head>
-<body class="mode-stellar">
+<body>
 
-<div id="crosshair"></div>
-<button id="menu-toggle" onclick="toggleSidebar()">☰</button>
-<button id="settings-toggle" onclick="toggleSettings()">⚙</button>
-<button id="btn-mark" onclick="markCenterPoint()">+</button>
-<div id="overlay" onclick="closeAll()"></div>
+<div id="overlay" onclick="closeSettings()"></div>
+
+<div id="settings-panel">
+    <h3 style="color:var(--accent)">SISTEMA</h3>
+    <button onclick="setTheme('stellar')">NEON</button>
+    <button onclick="setTheme('black')">BLACK</button>
+    <button onclick="setTheme('grid')">GRID</button>
+    
+    <div style="margin: 20px 0;">
+        <label style="font-size: 0.7em; color: #888;">OPACIDADE GRADE</label>
+        <input type="range" min="0" max="100" value="10" style="width:100%" oninput="updateGridOpacity(this.value)">
+    </div>
+
+    <hr style="opacity:0.1; margin: 20px 0;">
+    <p style="font-size: 0.7em; color: #888;">BACKUP EXTERNO</p>
+    <button onclick="exportData()" style="border-color: #4cd137; color: #4cd137;">BAIXAR ARQUIVO .JSON</button>
+    <button onclick="document.getElementById('fileInput').click()" style="border-color: #0097e6; color: #0097e6;">CARREGAR ARQUIVO</button>
+    <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
+
+    <button onclick="resetCamera()" style="margin-top:20px">CENTRALIZAR CÂMERA</button>
+    <button onclick="clearAllData()" style="color:#ff4757; border-color:#ff4757; margin-top: 20px;">RESETAR TUDO</button>
+    <button onclick="closeSettings()" style="border:none; color:#555; margin-top: 10px;">FECHAR</button>
+</div>
+
+<div id="custom-modal">
+    <h3 id="modal-title" style="color:var(--star-cyan)">ENTRADA</h3>
+    <input type="text" id="modal-input">
+    <div style="display:flex; gap:10px;">
+        <button id="modal-confirm-btn">SALVAR</button>
+        <button onclick="closeModal()">VOLTAR</button>
+    </div>
+</div>
 
 <div id="sidebar">
-    <h2>SETORES</h2>
-    <div id="map-list" style="overflow-y:auto; flex-grow:1;"></div>
-    <button class="action-btn" onclick="openModal('map')" style="margin-top: 20px;">+ NOVO SETOR</button>
-</div>
-
-<div id="settings-area">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h2>CONFIGURAÇÕES</h2>
-        <button onclick="toggleSettings()" style="background:none; border:none; color:#ff4757; font-size: 24px;">✕</button>
-    </div>
-
-    <div class="config-section">
-        <h3>APARÊNCIA</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-            <button class="action-btn" onclick="setTheme('stellar')">NEON</button>
-            <button class="action-btn" onclick="setTheme('black')">DARK</button>
-            <button class="action-btn" onclick="setTheme('grid')">GRID</button>
-        </div>
-        <div style="margin-top: 15px;">
-            <label style="font-size: 12px; opacity: 0.6;">OPACIDADE DA GRADE</label>
-            <input type="range" min="0" max="100" value="10" oninput="updateGridOpacity(this.value)" style="width:100%; margin-top:10px;">
-        </div>
-    </div>
-
-    <div class="config-section">
-        <h3>CÂMERA</h3>
-        <button class="action-btn" onclick="resetCamera(); toggleSettings();">CENTRALIZAR VISÃO</button>
-    </div>
-
-    <div class="config-section">
-        <h3>DADOS E BACKUP</h3>
-        <button class="action-btn" onclick="exportData()" style="border-color: #4cd137; color: #4cd137;">EXPORTAR JSON</button>
-        <button class="action-btn" onclick="document.getElementById('fileInput').click()" style="border-color: #0097e6; color: #0097e6;">IMPORTAR JSON</button>
-        <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
-        <button class="action-btn" onclick="clearAllData()" style="border-color: #ff4757; color: #ff4757; margin-top: 10px;">RESETAR TUDO</button>
-    </div>
-    
-    <p style="text-align: center; opacity: 0.3; font-size: 10px;">STELLAR PRO V2.0 - 2026</p>
-</div>
-
-<div id="custom-modal" style="position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#111; padding:25px; border:1px solid var(--star-cyan); z-index:3000; display:none; width:85%; border-radius:12px;">
-    <h3 id="modal-title">NOMEAR</h3>
-    <input type="text" id="modal-input" style="width:100%; padding:15px; background:#000; border:1px solid #333; color:#fff; margin-bottom:15px; border-radius:8px;">
-    <div style="display:flex; gap:10px;">
-        <button class="action-btn" onclick="confirmModal()" style="background:var(--star-cyan); color:#000; flex:1">SALVAR</button>
-        <button class="action-btn" onclick="closeModal()" style="border:none; flex:1">VOLTAR</button>
+    <h2 style="color:var(--star-cyan); font-size: 1em; letter-spacing: 2px;">STELLAR PRO</h2>
+    <div id="map-list" class="map-explorer"></div>
+    <div class="controls">
+        <button onclick="openModal('map')">+ NOVO SETOR</button>
+        <button onclick="saveCurrentMap()">SALVAR AGORA</button>
+        <button onclick="openSettings()">CONFIGURAÇÕES</button>
     </div>
 </div>
 
 <canvas id="canvas"></canvas>
 
 <script>
-// O código JavaScript permanece a mesma lógica robusta anterior, 
-// apenas com as funções de toggle de telas ajustadas.
-
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const sidebar = document.getElementById('sidebar');
-const settingsArea = document.getElementById('settings-area');
 const modal = document.getElementById('custom-modal');
 const overlay = document.getElementById('overlay');
+const settings = document.getElementById('settings-panel');
 const modalInput = document.getElementById('modal-input');
 
-const DB_KEY = 'stellar_mobile_split_v1';
+// Chave única para o banco de dados
+const DB_KEY = 'stellar_mapper_v_final';
+
 let maps = JSON.parse(localStorage.getItem(DB_KEY)) || {}; 
-let currentMapName = localStorage.getItem('last_map_split') || null;
+let currentMapName = localStorage.getItem('last_active_map') || null;
 let points = (currentMapName && maps[currentMapName]) ? [...maps[currentMapName]] : [];
-let camera = { x: 0, y: 0, zoom: 1 };
 let currentTheme = 'stellar';
 let gridOpacity = 0.1;
-
-// Touch Control
+let camera = { x: 0, y: 0, zoom: 1 };
 let isDragging = false;
-let lastTouchPos = { x: 0, y: 0 };
-let initialPinchDist = null;
-let initialZoom = 1;
+let lastMousePos = { x: 0, y: 0 };
 
-function setupCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.scale(dpr, dpr);
-    canvas.style.width = window.innerWidth + 'px';
-    canvas.style.height = window.innerHeight + 'px';
+function init() {
+    window.onresize = () => { 
+        canvas.width = window.innerWidth - 280; 
+        canvas.height = window.innerHeight; 
+    };
+    window.onresize();
+    renderMapList();
+    draw();
 }
 
-function toggleSidebar() { sidebar.classList.toggle('active'); overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none'; }
-function toggleSettings() { settingsArea.classList.toggle('active'); }
-function closeAll() { sidebar.classList.remove('active'); modal.style.display = 'none'; overlay.style.display = 'none'; }
+// Funções de Arquivo (Backup)
+function exportData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(maps));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "meu_mapa_estelar.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
 
+function importData(event) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            maps = imported;
+            saveToLocal();
+            location.reload();
+        } catch(err) { alert("Arquivo inválido!"); }
+    };
+    reader.readAsText(event.target.files[0]);
+}
+
+function updateGridOpacity(val) { gridOpacity = val / 100; }
 function resetCamera() { camera = { x: 0, y: 0, zoom: 1 }; }
-function setTheme(t) { document.body.className = 'mode-' + t; currentTheme = t; }
-function updateGridOpacity(v) { gridOpacity = v / 100; }
+function openSettings() { settings.classList.add('open'); overlay.style.display = 'block'; }
+function closeSettings() { settings.classList.remove('open'); overlay.style.display = 'none'; }
 
-function openModal(type) { 
-    currentModalType = type; 
-    modal.style.display = 'block'; 
+function openModal(type, data = null) {
     overlay.style.display = 'block';
-    modalInput.focus();
-}
-function closeModal() { modal.style.display = 'none'; if(!sidebar.classList.contains('active')) overlay.style.display = 'none'; }
-
-function confirmModal() {
-    const val = modalInput.value.trim();
-    if (currentModalType === 'map' && val) { maps[val] = []; switchMap(val); }
-    else if (currentModalType === 'point' && pendingPointData) {
-        points.push({ ...pendingPointData, label: val || `P-${points.length + 1}` });
-        saveCurrentMap();
-    }
-    closeAll();
+    modal.classList.add('active');
     modalInput.value = "";
+    modalInput.focus();
+    document.getElementById('modal-confirm-btn').onclick = () => {
+        const val = modalInput.value.trim();
+        if (type === 'map' && val) { maps[val] = []; switchMap(val); }
+        else if (type === 'point' && currentMapName) { 
+            points.push({x: data.x, y: data.y, label: val || `P-${points.length + 1}`}); 
+            saveCurrentMap(); // Auto-salva ao adicionar ponto
+        }
+        closeModal();
+    };
 }
 
-function markCenterPoint() {
-    if(!currentMapName) return alert("Crie um setor!");
-    pendingPointData = { x: -camera.x, y: -camera.y };
-    openModal('point');
+function closeModal() { modal.classList.remove('active'); if(!settings.classList.contains('open')) overlay.style.display='none'; }
+
+function setTheme(theme) { 
+    document.body.className = ''; 
+    if(theme !== 'stellar') document.body.classList.add('mode-' + theme);
+    currentTheme = theme;
 }
 
-function switchMap(name) { currentMapName = name; points = [...maps[name]]; localStorage.setItem('last_map_split', name); renderMapList(); }
-function saveCurrentMap() { if(currentMapName) { maps[currentMapName] = points; localStorage.setItem(DB_KEY, JSON.stringify(maps)); } }
 function renderMapList() {
     const list = document.getElementById('map-list');
     list.innerHTML = '';
     Object.keys(maps).forEach(name => {
         const div = document.createElement('div');
-        div.style = `padding:15px; background:rgba(255,255,255,0.05); margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between; ${name === currentMapName ? 'border:1px solid var(--star-cyan)' : ''}`;
-        div.innerHTML = `<span>${name}</span> <span onclick="deleteMap('${name}', event)">✖</span>`;
-        div.onclick = () => { switchMap(name); toggleSidebar(); };
+        div.className = `map-item ${name === currentMapName ? 'active-map' : ''}`;
+        div.innerHTML = `<span>${name.toUpperCase()}</span> <span onclick="deleteMap('${name}', event)" style="color:#ff4757; font-size:12px;">✖</span>`;
+        div.onclick = () => switchMap(name);
         list.appendChild(div);
     });
 }
 
-function deleteMap(name, e) { e.stopPropagation(); if(confirm("Excluir?")) { delete maps[name]; localStorage.setItem(DB_KEY, JSON.stringify(maps)); renderMapList(); } }
-function clearAllData() { if(confirm("Resetar TUDO?")) { localStorage.clear(); location.reload(); } }
-function exportData() { const blob = new Blob([JSON.stringify(maps)], {type:"application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "stellar_backup.json"; a.click(); }
-function importData(e) { const reader = new FileReader(); reader.onload = (ev) => { maps = JSON.parse(ev.target.result); localStorage.setItem(DB_KEY, JSON.stringify(maps)); location.reload(); }; reader.readAsText(e.target.files[0]); }
+function switchMap(name) {
+    currentMapName = name;
+    points = Array.isArray(maps[name]) ? [...maps[name]] : [];
+    localStorage.setItem('last_active_map', name);
+    renderMapList();
+}
+
+function deleteMap(name, e) {
+    e.stopPropagation();
+    if(confirm(`Apagar setor "${name}"?`)) {
+        delete maps[name];
+        if(currentMapName === name) currentMapName = Object.keys(maps)[0] || null;
+        saveToLocal();
+        renderMapList();
+    }
+}
+
+function saveCurrentMap() {
+    if(!currentMapName) return;
+    maps[currentMapName] = points;
+    saveToLocal();
+}
+
+function saveToLocal() {
+    localStorage.setItem(DB_KEY, JSON.stringify(maps));
+    localStorage.setItem('last_active_map', currentMapName);
+}
+
+function clearAllData() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
 
 function draw() {
     ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--space-black');
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     if(currentTheme === 'grid') {
         ctx.strokeStyle = `rgba(255, 159, 67, ${gridOpacity})`;
+        ctx.lineWidth = 1;
         let step = 60 * camera.zoom;
-        for(let x = (camera.x * camera.zoom) % step; x < window.innerWidth; x += step) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, window.innerHeight); ctx.stroke();
+        for(let x = (camera.x * camera.zoom) % step; x < canvas.width; x += step) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
         }
-        for(let y = (camera.y * camera.zoom) % step; y < window.innerHeight; y += step) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(window.innerWidth, y); ctx.stroke();
+        for(let y = (camera.y * camera.zoom) % step; y < canvas.height; y += step) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
         }
     }
 
+    if(!currentMapName) {
+        ctx.fillStyle = "#444"; ctx.textAlign = "center";
+        ctx.fillText("CRIE UM SETOR PARA COMEÇAR", canvas.width/2, canvas.height/2);
+        requestAnimationFrame(draw); return;
+    }
+
     ctx.save();
-    ctx.translate(window.innerWidth/2 + camera.x * camera.zoom, window.innerHeight/2 + camera.y * camera.zoom);
+    ctx.translate(canvas.width/2 + camera.x * camera.zoom, canvas.height/2 + camera.y * camera.zoom);
     ctx.scale(camera.zoom, camera.zoom);
 
     if (points.length > 1) {
-        ctx.beginPath(); ctx.strokeStyle = "rgba(0, 242, 255, 0.2)";
-        ctx.moveTo(points[0].x, points[0].y);
+        ctx.beginPath();
+        ctx.strokeStyle = currentTheme === 'black' ? "#1a1a1a" : (currentTheme === 'grid' ? "rgba(255, 159, 67, 0.2)" : "rgba(0, 242, 255, 0.3)");
+        ctx.lineWidth = 1.5; ctx.moveTo(points[0].x, points[0].y);
         points.forEach(p => ctx.lineTo(p.x, p.y)); ctx.stroke();
     }
 
     points.forEach(p => {
-        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
-        ctx.font = "10px Arial"; ctx.fillStyle = varColor('--star-cyan');
-        ctx.fillText(p.label, p.x + 8, p.y + 3);
+        ctx.fillStyle = currentTheme === 'black' ? "#fff" : (currentTheme === 'grid' ? "#ff9f43" : "#fff");
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+        ctx.font = "bold 11px Arial"; ctx.textAlign = "center";
+        ctx.fillStyle = currentTheme === 'black' ? "#555" : (currentTheme === 'grid' ? "#ff9f43" : "#00f2ff");
+        ctx.fillText(p.label.toUpperCase(), p.x, p.y - 12); 
     });
 
     ctx.restore();
     requestAnimationFrame(draw);
 }
-function varColor(n) { return getComputedStyle(document.body).getPropertyValue(n); }
 
-// Eventos de Toque e Zoom
-canvas.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) { isDragging = true; lastTouchPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
-    else if (e.touches.length === 2) { isDragging = false; initialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); initialZoom = camera.zoom; }
+canvas.addEventListener('mousedown', e => {
+    if(!currentMapName || settings.classList.contains('open')) return;
+    const x = (e.clientX - 280 - canvas.width/2 - camera.x * camera.zoom) / camera.zoom;
+    const y = (e.clientY - canvas.height/2 - camera.y * camera.zoom) / camera.zoom;
+    if (e.button === 0) openModal('point', {x, y});
+    else { isDragging = true; lastMousePos = { x: e.clientX, y: e.clientY }; }
 });
-canvas.addEventListener('touchmove', e => {
-    if (e.touches.length === 1 && isDragging) {
-        camera.x += (e.touches[0].clientX - lastTouchPos.x) / camera.zoom;
-        camera.y += (e.touches[0].clientY - lastTouchPos.y) / camera.zoom;
-        lastTouchPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    } else if (e.touches.length === 2) {
-        const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        camera.zoom = Math.min(Math.max(initialZoom * (dist / initialPinchDist), 0.2), 5);
+
+window.addEventListener('mousemove', e => {
+    if (isDragging) {
+        camera.x += (e.clientX - lastMousePos.x) / camera.zoom;
+        camera.y += (e.clientY - lastMousePos.y) / camera.zoom;
+        lastMousePos = { x: e.clientX, y: e.clientY };
     }
 });
-canvas.addEventListener('touchend', () => isDragging = false);
+window.addEventListener('mouseup', () => isDragging = false);
+canvas.addEventListener('wheel', e => { camera.zoom *= (e.deltaY > 0 ? 0.9 : 1.1); e.preventDefault(); }, {passive: false});
+canvas.addEventListener('contextmenu', e => e.preventDefault());
 
-setupCanvas();
-renderMapList();
-draw();
+init();
 </script>
 </body>
 </html>
